@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        background: rgb(187, 138, 138);
+      }
+      #start-btn {
+        position: absolute;
+        width: 200px;
+        height: 100px;
+        background: black;
+        color: white;
+        border-radius: 13% 13% 13% 13%/25% 25% 25% 25%;
+        border: none;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 999;
+        cursor: pointer;
+      }
+      #box {
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        background: rgb(144, 100, 107);
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      p {
+        z-index: 999;
+        color: black;
+        background: rgba(255, 255, 255, 0.3);
+        position: relative;
+        display: inline-block;
+        border-radius: 13% 13% 13% 13%/30% 30% 30% 30%;
+        width: 100px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        margin: 5px;
+      }
+      #scorebox {
+        width: 400px;
+        height: 200px;
+        background: black;
+        color: white;
+        display: inline-block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        line-height: 200px;
+      }
+      #gooseimg {
+        width: 25px;
+        height: 25px;
+        position: relative;
+        top: 3px;
+        left: -10px;
+      }
+      #chiwawaimg {
+        width: 25px;
+        height: 20px;
+        position: relative;
+        top: 3px;
+        left: -10px;
+      }
+      #box img {
+        position: absolute;
+        height: 150px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="box"></div>
+    <input type="button" value="開始遊戲" id="start-btn" />
+    <p id="scorebox">你總共得了<span id="text-score">0</span>分</p>
+    <p><img src="./goose1.png" id="gooseimg" /><span id="text-goose">0</span></p>
+    <br />
+    <p><img src="./chiwawa.png" id="chiwawaimg" /><span id="text-chiwawa">0</span></p>
+    <br />
+    <p>時間：<span id="text-time">0</span></p>
+
+    <script src="./jquery-3.5.1.min.js"></script>
+    <script>
+      let score = 0;
+      let time = 10;
+      let time2 = 3;
+      let id = 0;
+      let textGoose = 0;
+      let textChiwawa = 0;
+      const rand = (num) => {
+        return Math.floor(Math.random() * num);
+      };
+
+      const movegoose = (id) => {
+        $(`#goose${id}`).animate(
+          {
+            left: rand(70) + "%",
+            top: rand(70) + "%",
+          },
+          2000,
+          function () {
+            movegoose(id);
+          }
+        );
+      };
+      const movechiwawa = (id) => {
+        $(`#chiwawa${id}`).animate(
+          {
+            left: rand(70) + "%",
+            top: rand(70) + "%",
+          },
+          2000,
+          function () {
+            movechiwawa(id);
+          }
+        );
+      };
+
+      $("#scorebox").css("display", "none");
+
+      $("#start-btn").click(function () {
+        $("#start-btn").attr("disabled", true);
+        $("#start-btn").css("display", "none");
+        textGoose = 0;
+        $("#text-goose").text(textGoose);
+        textChiwawa = 0;
+        $("#text-chiwawa").text(textChiwawa);
+        score = 0;
+        $("#text-score").text(score);
+        time = 10;
+        $("#text-time").text(time);
+        time2 = 3;
+
+        let timer = setInterval(function () {
+          time--;
+          $("#text-time").text(time);
+
+          if (time <= 0) {
+            clearInterval(timer);
+            $("#scorebox").css("display", "initial");
+            let timer2 = setInterval(function () {
+              time2--;
+              if (time2 == 0) {
+                clearInterval(timer2);
+                $("#box img").remove();
+                $("#scorebox").css("display", "none");
+                $("#start-btn").css("display", "initial");
+                $("#start-btn").attr("disabled", false);
+              }
+            }, 1000);
+          }
+
+          if (rand(10) > 5) {
+            $("#box").append(`<img class="img1" src="./goose.gif" id="goose${id}" >`);
+            $(`#goose${id}`).css({
+              left: rand(70) + "%",
+              top: rand(70) + "%",
+            });
+            movegoose(id);
+            id++;
+          } else {
+            $("#box").append(`<img class="img2" src="./chiwawa.gif" id="chiwawa${id}">`);
+            $(`#chiwawa${id}`).css({
+              left: rand(70) + "%",
+              top: rand(70) + "%",
+            });
+            movechiwawa(id);
+            id++;
+          }
+        }, 1000);
+      });
+      $("#box").on("click", ".img1", function () {
+        $(this).attr("src", "./love.gif");
+        $(this).stop(true, false);
+        $(this).css("pointer-events", "none");
+        textGoose++;
+        $("#text-goose").text(textGoose);
+        score += 3;
+        $("#text-score").text(score);
+      });
+      $("#box").on("click", ".img2", function () {
+        $(this).attr("src", "./error.gif");
+        $(this).stop(true, false);
+        $(this).css("pointer-events", "none");
+        textChiwawa++;
+        $("#text-chiwawa").text(textChiwawa);
+        score -= 3;
+        $("#text-score").text(score);
+      });
+    </script>
+  </body>
+</html>
